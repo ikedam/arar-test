@@ -1,0 +1,24 @@
+name: ci
+on:
+  push:
+jobs:
+  check:
+    name: terraform plan
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: install arar
+        run: |
+          curl -sL -o arar https://github.com/ikedam/arar/releases/download/v0.0.1/arar_0.0.1_linux_amd64
+          chmod 755 arar
+      - uses: hashicorp/setup-terraform@v2
+        with:
+          terraform_version: 1.5.7
+      - name: terraform plan
+        run: |
+          terraform init
+          ./arar -u -- terraform plan
+        env:
+          AWS_ACCESS_KEY_ID: ${{ secret.AWS_ACCESS_KEY_ID }}
+          AWS_SECRET_ACCESS_KEY: ${{ secret.AWS_SECRET_ACCESS_KEY }}
+          AWS_ROLE_ARN: arn:aws:iam::489711392333:role/assumerole-role
